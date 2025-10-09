@@ -36,6 +36,8 @@ Route::middleware(['api'])->prefix('auth')->controller(AuthController::class)->g
     Route::post('password/reset', [AuthController::class, 'resetPassword']);
 });
 
+Route::get('imoveis/public', [ImovelController::class, 'indexPublic']);
+
 Route::middleware(['jwt.verify'])->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('logout', [AuthController::class, 'logout']);

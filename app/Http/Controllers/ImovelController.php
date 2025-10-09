@@ -31,6 +31,29 @@ class ImovelController extends Controller
         return response()->json($query->get());
     }
 
+    public function indexPublic(Request $request)
+    {
+        $query = Imovel::query()->with('fotos');
+
+        if ($request->filled('cidade')) {
+            $query->where('cidade', 'like', "%{$request->cidade}%");
+        }
+
+        if ($request->filled('endereco')) {
+            $query->where('endereco', 'like', "%{$request->endereco}%");
+        }
+
+        if ($request->filled('tipo')) {
+            $query->where('tipo', $request->tipo);
+        }
+
+        if ($request->filled('nome')) {
+            $query->where('nome_arquivo', 'like', "%{$request->nome}%");
+        }
+
+        return response()->json($query->get());
+    }
+
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -38,6 +61,9 @@ class ImovelController extends Controller
             'endereco' => 'nullable|string',
             'tipo' => 'nullable|string',
             'valor' => 'nullable|numeric',
+            'numero_banheiros' => 'nullable|numeric',
+            'numero_quartos' => 'nullable|numeric',
+            'area' => 'nullable|numeric',
         ]);
 
         $imovel = Imovel::create($data);
