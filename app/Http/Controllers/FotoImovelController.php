@@ -23,7 +23,7 @@ class FotoImovelController extends Controller
     {
         $request->validate([
             'imovel_id' => 'required|exists:imoveis,id',
-            'foto' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'foto' => 'required|image|max:20480',
             'descricao' => 'nullable|string|max:255',
         ]);
 
@@ -45,7 +45,7 @@ class FotoImovelController extends Controller
     {
         $request->validate([
             'imovel_id' => 'required|exists:imoveis,id',
-            'fotos.*' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'fotos.*' => 'required|image|mimes:jpg,jpeg,png|max:20480',
             'descricoes' => 'nullable|array',
         ]);
 

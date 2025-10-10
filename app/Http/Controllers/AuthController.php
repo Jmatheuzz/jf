@@ -51,7 +51,8 @@ class AuthController extends Controller
             'role' => $user['role'], 
             'token' => $token, 
             'token_type' => 'bearer',
-            'userId' => $user['id']
+            'userId' => $user['id'],
+            'name' => $user['name']
         ], 'Login Successfully');
     }
 
@@ -102,6 +103,7 @@ class AuthController extends Controller
 
         $token = Auth::login($user);
         return $this->responseWithSuccess([
+            'name' => $user['name'],
             'role' => $user['role'], 
             'token' => $token, 
             'token_type' => 'bearer',

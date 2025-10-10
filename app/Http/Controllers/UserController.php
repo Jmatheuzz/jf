@@ -7,15 +7,19 @@ use Illuminate\Http\Request;
 class UserController extends Controller
 {
     public function index(Request $request)
-    {
-        $query = User::query();
+{
+    $query = User::query();
 
-        if ($request->filled('name')) {
-            $query->where('name', 'like', "%{$request->name}%");
-        }
-
-        return response()->json($query->get());
+    if ($request->filled('name')) {
+        $query->where('name', 'like', "%{$request->name}%");
     }
+
+    if ($request->filled('role')) {
+        $query->where('role', $request->role);
+    }
+
+    return response()->json($query->get());
+}
 
     public function getCorretores(Request $request)
     {
@@ -47,7 +51,13 @@ class UserController extends Controller
             'password' => 'required|string',
             'role' => 'required|string',
             'telefone' => 'required|string',
-            'creci' => 'required|string'
+            'creci' => 'nullable',
+            'rg' => 'nullable',
+            'cpf' => 'nullable',
+            'estado_civil' => 'nullable',
+            'renda' => 'nullable',
+            'profissao' => 'nullable',
+            'possui_fgts' => 'nullable'
         ]);
 
         $data['password'] = bcrypt($data['password']);
