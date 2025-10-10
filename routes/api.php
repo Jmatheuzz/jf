@@ -37,6 +37,7 @@ Route::middleware(['api'])->prefix('auth')->controller(AuthController::class)->g
 });
 
 Route::get('imoveis/public', [ImovelController::class, 'indexPublic']);
+Route::get('imoveis/public/{id}', [ImovelController::class, 'show']);
 
 Route::middleware(['jwt.verify'])->group(function () {
     Route::get('/me', [AuthController::class, 'me']);

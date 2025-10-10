@@ -64,6 +64,7 @@ class ImovelController extends Controller
             'numero_banheiros' => 'nullable|numeric',
             'numero_quartos' => 'nullable|numeric',
             'area' => 'nullable|numeric',
+            'descricao' => 'nullable|string',
         ]);
 
         $imovel = Imovel::create($data);
@@ -73,7 +74,7 @@ class ImovelController extends Controller
 
     public function show($id)
     {
-        $imovel = Imovel::with(['fotos', 'cliente', 'corretor'])->findOrFail($id);
+        $imovel = Imovel::with(['fotos'])->findOrFail($id);
 
         return response()->json($imovel);
     }
