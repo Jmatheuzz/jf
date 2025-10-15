@@ -174,7 +174,7 @@ public function getRankingCorretores(): array
             $processosDTO = $processosEmAndamento->map(function ($processo) {
                 return [
                     'id' => $processo->id,
-                    'clienteNome' => $processo->cliente->nome ?? 'Cliente Desconhecido',
+                    'clienteNome' => $processo->cliente->name ?? 'Cliente Desconhecido',
                     'etapaAtual' => $processo->etapa,
                 ];
             })->toArray(); // Converte a Collection de volta para array

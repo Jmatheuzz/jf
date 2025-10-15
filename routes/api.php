@@ -65,7 +65,7 @@ Route::middleware(['jwt.verify'])->group(function () {
     Route::post('processos/{id}/adicionar-imovel', [ProcessoHabitacionalController::class, 'adicionarImovel']);
 
     // Confirmar visita
-    Route::post('visitas/{id}/confirmar', [VisitaController::class, 'confirmar']);
+    Route::post('visitas/confirmar/{id}', [VisitaController::class, 'confirmar']);
 
     Route::get('taxa-conversao', [MetricaController::class, 'taxaConversao']);
     Route::get('quantidade-clientes', [MetricaController::class, 'quantidadeClientes']);
