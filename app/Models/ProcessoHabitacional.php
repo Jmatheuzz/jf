@@ -7,17 +7,18 @@ class ProcessoHabitacional extends Model
 {
     use HasFactory;
     protected $table = 'processos_habitacionais';
-    protected $fillable = ['cliente_id','corretor_id','imovel_id','etapa','interesse'];
+    protected $fillable = ['cliente_id','corretor_id','imovel_id','etapa','interesse', 'observacao'];
 
     public function cliente() { return $this->belongsTo(User::class); }
     public function corretor() { return $this->belongsTo(User::class); }
     public function imovel() { return $this->belongsTo(Imovel::class); }
     public function historico() { return $this->hasMany(ProcessoHabitacionalHistory::class, 'processo_id'); }
 
-    private static $etapas = [
+    public static $etapas = [
         'COLETA_DOCUMENTACAO'   => 'Coleta de Documentação',
         'ANALISE_CREDITO'       => 'Análise de Crédito',
-        'RESERVA'               => 'Reserva do Imóvel',
+        'APROVADO'              => 'Aprovado',
+        'ENTREVISTA_GERENCIAL'  => 'Entrevista gerencial',
         'CONTRATO_EMPREITADA'   => 'Contrato de Empreitada',
         'CONFECCAO_PROJETO'     => 'Confecção do Projeto',
         'ENTREGA_PREFEITURA'    => 'Entrega na Prefeitura',

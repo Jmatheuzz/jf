@@ -51,6 +51,8 @@ class ImovelController extends Controller
             $query->where('nome_arquivo', 'like', "%{$request->nome}%");
         }
 
+        $query->where('disponivel', true);
+
         return response()->json($query->get());
     }
 

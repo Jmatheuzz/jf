@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\Imovel;
 use App\Models\ProcessoHabitacional;
 use App\Models\ProcessoHabitacionalHistory;
 use App\Services\TimelineService;
@@ -30,6 +31,7 @@ class ProcessoHabitacionalController extends Controller
             'cliente_id' => 'required|integer',
             'corretor_id' => 'nullable|integer',
             'imovel_id' => 'nullable|integer',
+            'observacao' => 'nullable|string',
         ]);
 
         $processo = ProcessoHabitacional::create($data);
@@ -122,6 +124,10 @@ class ProcessoHabitacionalController extends Controller
         $request->validate(['imovel_id' => 'required|integer']);
         $processo->imovel_id = $request->imovel_id;
         $processo->save();
+
+        $imovel = Imovel::find($request->imovel_id);
+        $imovel->disponivel = false;
+        $imovel->save();
 
         return response()->json(['message' => 'Imóvel adicionado ao processo com sucesso']);
     }
