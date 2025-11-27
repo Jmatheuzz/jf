@@ -1,19 +1,19 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Models\Comissao;
 use App\Models\Imovel;
-use App\Models\ProcessoHabitacional;
-use App\Models\ProcessoHabitacionalHistory;
+use App\Models\Atendimento;
+use App\Models\AtendimentoHistory;
 use App\Services\TimelineService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
-class ProcessoHabitacionalController extends Controller
+class AtendimentoController extends Controller
 {
     public function index(Request $request)
     {
         $user = auth()->user();
-        $query = ProcessoHabitacional::with(['cliente', 'imovel', 'corretor']);
+        $query = Atendimento::with(['cliente', 'corretor']);
 
         if ($user->role === 'CORRETOR') {
             $query->where('corretor_id', $user->id);
@@ -42,14 +42,14 @@ class ProcessoHabitacionalController extends Controller
             'observacao' => 'nullable|string',
         ]);
 
-        $processo = ProcessoHabitacional::create($data);
+        $processo = Atendimento::create($data);
         return response()->json($processo, 201);
     }
 
     public function show($id)
     {
         $user = auth()->user();
-        $processo = ProcessoHabitacional::with(['cliente', 'imovel', 'corretor'])->findOrFail($id);
+        $processo = Atendimento::with(['cliente', 'corretor'])->findOrFail($id);
 
         if ($user->role === 'CORRETOR' && $processo->corretor_id !== $user->id) {
             return response()->json(['error' => 'Unauthorized'], 403);
@@ -59,7 +59,7 @@ class ProcessoHabitacionalController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $timeline = TimelineService::montarTimeline($processo->etapa);
+        $timeline = TimelineService::montarTimelineAtendimento($processo->etapa);
 
         return response()->json([
             'processo' => $processo,
@@ -70,7 +70,7 @@ class ProcessoHabitacionalController extends Controller
     public function update(Request $request, $id)
     {
         $user = auth()->user();
-        $processo = ProcessoHabitacional::findOrFail($id);
+        $processo = Atendimento::findOrFail($id);
 
         if ($user->role === 'CORRETOR' && $processo->corretor_id !== $user->id) {
             return response()->json(['error' => 'Unauthorized'], 403);
@@ -87,7 +87,7 @@ class ProcessoHabitacionalController extends Controller
     public function destroy($id)
     {
         $user = auth()->user();
-        $processo = ProcessoHabitacional::findOrFail($id);
+        $processo = Atendimento::findOrFail($id);
 
         if ($user->role === 'CORRETOR' && $processo->corretor_id !== $user->id) {
             return response()->json(['error' => 'Unauthorized'], 403);
@@ -97,14 +97,14 @@ class ProcessoHabitacionalController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        ProcessoHabitacional::destroy($id);
+        Atendimento::destroy($id);
         return response()->json(null, 204);
     }
 
     public function avancarEtapa($id)
     {
         $user = auth()->user();
-        $processo = ProcessoHabitacional::with(['imovel'])->findOrFail($id);
+        $processo = Atendimento::findOrFail($id);
 
         if ($user->role === 'CORRETOR' && $processo->corretor_id !== $user->id) {
             return response()->json(['error' => 'Unauthorized'], 403);
@@ -122,26 +122,12 @@ class ProcessoHabitacionalController extends Controller
             return response()->json(['message' => 'O processo já está na última etapa.'], 400);
         }
 
-        if ($novaEtapa === 'REGISTRO_CARTORIO') {
-            Comissao::create([
-                'processo_habitacional_id' => $processo->id,
-                'valor' => $processo->imovel->valor * 0.03,
-                'pago' => false,
-            ]);
-        }
-
         $processo->update(['etapa' => $novaEtapa]);
-
-        ProcessoHabitacionalHistory::create([
-            'processo_id' => $processo->id,
-            'etapa'       => $novaEtapa,
-            'observacao'  => "Avançou da etapa {$etapaAnterior} para {$novaEtapa} via API"
-        ]);
 
         return response()->json([
             'message' => 'Etapa avançada com sucesso!',
             'etapa' => $novaEtapa,
-            'descricao' => ProcessoHabitacional::$etapas[$novaEtapa] ?? null,
+            'descricao' => Atendimento::$etapas[$novaEtapa] ?? null,
         ]);
     }
 
@@ -151,7 +137,7 @@ class ProcessoHabitacionalController extends Controller
     public function voltarEtapa($id)
     {
         $user = auth()->user();
-        $processo = ProcessoHabitacional::findOrFail($id);
+        $processo = Atendimento::findOrFail($id);
 
         if ($user->role === 'CORRETOR' && $processo->corretor_id !== $user->id) {
             return response()->json(['error' => 'Unauthorized'], 403);
@@ -171,23 +157,17 @@ class ProcessoHabitacionalController extends Controller
 
         $processo->update(['etapa' => $novaEtapa]);
 
-        ProcessoHabitacionalHistory::create([
-            'processo_id' => $processo->id,
-            'etapa'       => $novaEtapa,
-            'observacao'  => "Retrocedeu da etapa {$etapaAnterior} para {$novaEtapa} via API"
-        ]);
-
         return response()->json([
             'message' => 'Etapa retornada com sucesso!',
             'etapa' => $novaEtapa,
-            'descricao' => ProcessoHabitacional::$etapas[$novaEtapa] ?? null,
+            'descricao' => Atendimento::$etapas[$novaEtapa] ?? null,
         ]);
     }
 
     public function adicionarImovel(Request $request, $id)
     {
         $user = auth()->user();
-        $processo = ProcessoHabitacional::findOrFail($id);
+        $processo = Atendimento::findOrFail($id);
 
         if ($user->role === 'CORRETOR' && $processo->corretor_id !== $user->id) {
             return response()->json(['error' => 'Unauthorized'], 403);
@@ -208,10 +188,10 @@ class ProcessoHabitacionalController extends Controller
         return response()->json(['message' => 'Imóvel adicionado ao processo com sucesso']);
     }
 
-    public function groupedByEtapa()
+    public function groupedByEtapa(Request $request)
     {
         $user = auth()->user();
-        $query = ProcessoHabitacional::with(['cliente', 'imovel', 'corretor']);
+        $query = Atendimento::with(['cliente', 'corretor']);
 
         if ($user->role === 'CORRETOR') {
             $query->where('corretor_id', $user->id);
@@ -221,7 +201,7 @@ class ProcessoHabitacionalController extends Controller
 
         $processos = $query->get();
         $grouped = $processos->groupBy(function ($processo) {
-            return ProcessoHabitacional::$etapas[$processo->etapa] ?? $processo->etapa;
+            return Atendimento::$etapas[$processo->etapa] ?? $processo->etapa;
         });
         return response()->json($grouped);
     }

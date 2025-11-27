@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\AtendimentoController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ComissaoController;
 use App\Http\Controllers\FotoImovelController;
 use App\Http\Controllers\ImovelController;
 use App\Http\Controllers\MetricaController;
@@ -9,6 +11,7 @@ use App\Http\Controllers\ProcessoHabitacionalController;
 use App\Http\Controllers\ProcessoHabitacionalHistoryController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VisitaController;
+use App\Models\Atendimento;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -51,10 +54,12 @@ Route::middleware(['jwt.verify'])->group(function () {
     Route::post('fotos-imovel/multiplas', [FotoImovelController::class, 'storeMultiple']);
 
     Route::apiResource('processos', ProcessoHabitacionalController::class);
+    Route::apiResource('atendimentos', AtendimentoController::class);
     Route::apiResource('processos-historico', ProcessoHabitacionalHistoryController::class);
     Route::apiResource('pos-vendas', PosVendaController::class);
     Route::apiResource('users', UserController::class);
     Route::apiResource('visitas', VisitaController::class);
+    Route::apiResource('comissoes', ComissaoController::class);
 
     Route::get('corretores', [UserController::class, 'getCorretores']);
     Route::get('clientes', [UserController::class, 'getClientes']);
@@ -63,6 +68,13 @@ Route::middleware(['jwt.verify'])->group(function () {
     Route::post('processos/{id}/proxima-etapa', [ProcessoHabitacionalController::class, 'avancarEtapa']);
     Route::post('processos/{id}/etapa-anterior', [ProcessoHabitacionalController::class, 'voltarEtapa']);
     Route::post('processos/{id}/adicionar-imovel', [ProcessoHabitacionalController::class, 'adicionarImovel']);
+    Route::post('processos/grouped-by-etapa', [ProcessoHabitacionalController::class, 'groupedByEtapa']);
+
+    Route::post('atendimentos/grouped-by-etapa', [AtendimentoController::class, 'groupedByEtapa']);
+    Route::post('atendimentos/{id}/proxima-etapa', [AtendimentoController::class, 'avancarEtapa']);
+    Route::post('atendimentos/{id}/etapa-anterior', [AtendimentoController::class, 'voltarEtapa']);
+    Route::post('atendimentos/{id}/adicionar-imovel', [AtendimentoController::class, 'adicionarImovel']);
+     
 
     // Confirmar visita
     Route::post('visitas/confirmar/{id}', [VisitaController::class, 'confirmar']);

@@ -57,7 +57,8 @@ class UserController extends Controller
             'estado_civil' => 'nullable',
             'renda' => 'nullable',
             'profissao' => 'nullable',
-            'possui_fgts' => 'nullable'
+            'possui_fgts' => 'nullable',
+            'possui_filhos_menor' => 'nullable'
         ]);
 
         $data['password'] = bcrypt($data['password']);

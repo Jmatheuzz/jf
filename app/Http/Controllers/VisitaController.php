@@ -8,7 +8,19 @@ class VisitaController extends Controller
 {
     public function index(Request $request)
     {
+        $user = auth()->user();
         $query = Visita::with(['imovel', 'processo']);
+
+        if ($user->role === 'CORRETOR' || $user->role === 'CLIENTE') {
+            $query->whereHas('processo', function ($q) use ($user) {
+                if ($user->role === 'CORRETOR') {
+                    $q->where('corretor_id', $user->id);
+                } elseif ($user->role === 'CLIENTE') {
+                    $q->where('cliente_id', $user->id);
+                }
+            });
+        }
+
 
         if ($request->filled('imovel_id')) {
             $query->where('imovel_id', $request->imovel_id);
@@ -25,7 +37,6 @@ class VisitaController extends Controller
     {
         $data = $request->validate([
             'data_visita' => 'nullable|date',
-            'imovel_id' => 'nullable|integer',
             'processo_id' => 'nullable|integer',
             'imovel_id' => 'nullable|integer'
         ]);
@@ -36,25 +47,67 @@ class VisitaController extends Controller
 
     public function show($id)
     {
-        return response()->json(Visita::with(['imovel','processo'])->findOrFail($id));
+        $user = auth()->user();
+        $visita = Visita::with(['imovel','processo'])->findOrFail($id);
+
+        if ($user->role === 'CORRETOR' && $visita->processo->corretor_id !== $user->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        if ($user->role === 'CLIENTE' && $visita->processo->cliente_id !== $user->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        return response()->json($visita);
     }
 
     public function update(Request $request, $id)
     {
+        $user = auth()->user();
         $visita = Visita::findOrFail($id);
+
+        if ($user->role === 'CORRETOR' && $visita->processo->corretor_id !== $user->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        if ($user->role === 'CLIENTE' && $visita->processo->cliente_id !== $user->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
         $visita->update($request->all());
         return response()->json($visita);
     }
 
     public function destroy($id)
     {
+        $user = auth()->user();
+        $visita = Visita::findOrFail($id);
+
+        if ($user->role === 'CORRETOR' && $visita->processo->corretor_id !== $user->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        if ($user->role === 'CLIENTE' && $visita->processo->cliente_id !== $user->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
         Visita::destroy($id);
         return response()->json(null, 204);
     }
 
     public function confirmar($id)
     {
+        $user = auth()->user();
         $visita = Visita::findOrFail($id);
+
+        if ($user->role === 'CORRETOR' && $visita->processo->corretor_id !== $user->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        if ($user->role === 'CLIENTE' && $visita->processo->cliente_id !== $user->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        
         $visita->update(['confirmada' => true]);
         return response()->json(['message' => 'Visita confirmada com sucesso']);
     }

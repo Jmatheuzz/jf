@@ -4,13 +4,14 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -19,7 +20,7 @@ class User extends Authenticatable implements JWTSubject
      */
     protected $fillable = [
         'name', 'code', 'email','password','role','email_verified_at'
-    ,'telefone','cpf','estado_civil','profissao','renda','rg','creci', 'possui_fgts'];
+    ,'telefone','cpf','estado_civil','profissao','renda','rg','creci', 'possui_fgts', 'possui_filhos_menor'];
 
 
     protected $hidden = ['password', 'code'];
@@ -32,6 +33,7 @@ class User extends Authenticatable implements JWTSubject
     protected $casts = [
         'email_verified_at' => 'datetime',
         'possui_fgts' => 'boolean',
+        'possui_filhos_menor' => 'boolean',
     ];
 
     /**

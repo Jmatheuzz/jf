@@ -2,11 +2,11 @@
 namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Imovel extends Model
-
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'imoveis';
     protected $fillable = ['cidade','endereco','tipo','valor','descricao','area','numero_banheiros','numero_quartos','disponivel'];

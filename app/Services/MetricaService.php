@@ -181,7 +181,7 @@ public function getRankingCorretores(): array
 
             $pipeline[] = [
                 'corretorId' => $corretor->id,
-                'nomeCorretor' => $corretor->nome,
+                'nomeCorretor' => $corretor->name,
                 'totalProcessosEmAndamento' => count($processosDTO),
                 'processos' => $processosDTO,
             ];

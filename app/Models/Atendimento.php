@@ -4,29 +4,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ProcessoHabitacional extends Model
+class Atendimento extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $table = 'processos_habitacionais';
-    protected $fillable = ['cliente_id','corretor_id','imovel_id','etapa','interesse', 'observacao'];
+    protected $table = 'atendimentos';
+    protected $fillable = ['cliente_id','corretor_id','etapa','interesse', 'observacao', 'is_active'];
 
     public function cliente() { return $this->belongsTo(User::class); }
     public function corretor() { return $this->belongsTo(User::class); }
-    public function imovel() { return $this->belongsTo(Imovel::class); }
-    public function historico() { return $this->hasMany(ProcessoHabitacionalHistory::class, 'processo_id'); }
 
     public static $etapas = [
-        'CONTRATO_EMPREITADA'   => 'Contrato de Empreitada',
-        'CONFECCAO_PROJETO'     => 'Confecção do Projeto',
-        'ENTREGA_PREFEITURA'    => 'Entrega na Prefeitura',
-        'ABERTURA_OS' => 'Abertura de Ordem de serviço',
-        'AVALIACAO_CAIXA' => 'Avaliação da engenharia caixa',
-        'CONFORMIDADE_PROCESSO' => 'Conformidade do processo',
-        'ASSINATURA_CONTRATO'   => 'Assinatura do Contrato',
-        'REGISTRO_CARTORIO'     => 'Registro em Cartório',
-        'HABITISE_EMITIDO'     => 'Habite-se emitido',
-        'AVERBACAO_OBRA'     => 'Averbação da obra',
-        'IMOVEL_ENTREGUE'            => 'Imóvel entregue',
+        'SIMULACAO'   => 'Simulação',
+        'COLHER_DOCUMENTACAO'       => 'Colher documentação',
+        'ABERTURA_CONTA'              => 'Abertura de conta',
+        'CONFORMIDADE_CONTA'  => 'Conformidade de conta',
+        'ANALISE_CREDITO'   => 'Análise de crédito'
     ];
 
     // 🔙 Etapa anterior
