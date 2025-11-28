@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('atendimentos', function (Blueprint $table) {
-            $table->boolean('is_active')->default(true); 
+        Schema::table('processos_habitacionais', function (Blueprint $table) {
+            $table->string('status_etapa')->default('PENDENTE')->after('etapa');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('atendimentos', function (Blueprint $table) {
-            $table->dropColumn('is_active');
+        Schema::table('processos_habitacionais', function (Blueprint $table) {
+            $table->dropColumn('status_etapa');
         });
     }
 };

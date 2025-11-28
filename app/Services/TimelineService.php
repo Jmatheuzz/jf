@@ -10,36 +10,21 @@ class TimelineService
     const STATUS_CONCLUIDA = 'CONCLUIDA';
     const STATUS_EM_ANDAMENTO = 'EM_ANDAMENTO';
     const STATUS_PENDENTE = 'PENDENTE';
-
-
-    public static function montarTimeline(string $etapaAtual): array
+    public static function montarTimeline(string $etapaAtual, string $statusEtapaAtual): array
     {
         $timeline = [];
         $todasEtapas = ProcessoHabitacional::$etapas;
 
-        if ($etapaAtual === 'FINALIZADO') {
-            foreach ($todasEtapas as $chave => $descricao) {
-                $timeline[] = [
-                    'chave' => $chave,
-                    'descricao' => $descricao,
-                    'status' => self::STATUS_CONCLUIDA
-                ];
-            }
-            return $timeline;
-        }
-
         $etapaEncontrada = false;
 
         foreach ($todasEtapas as $chave => $descricao) {
-            if (!$etapaEncontrada) {
-                if ($chave === $etapaAtual) {
-                    $status = self::STATUS_EM_ANDAMENTO;
-                    $etapaEncontrada = true;
-                } else {
-                    $status = self::STATUS_CONCLUIDA;
-                }
+            if ($chave === $etapaAtual) {
+                $status = $statusEtapaAtual;
+                $etapaEncontrada = true;
+            } elseif (!$etapaEncontrada) {
+                $status = ProcessoHabitacional::STATUS_CONCLUIDA;
             } else {
-                $status = self::STATUS_PENDENTE;
+                $status = ProcessoHabitacional::STATUS_PENDENTE;
             }
 
             $timeline[] = [

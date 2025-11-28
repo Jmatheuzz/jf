@@ -8,17 +8,22 @@ class ProcessoHabitacional extends Model
 {
     use HasFactory, SoftDeletes;
     protected $table = 'processos_habitacionais';
-    protected $fillable = ['cliente_id','corretor_id','imovel_id','etapa','interesse', 'observacao'];
+    protected $fillable = ['cliente_id','corretor_id','imovel_id','etapa','interesse', 'observacao', 'status_etapa'];
+    protected $with = ['cliente', 'corretor'];
+    protected $appends = ['descricao_etapa'];
 
     public function cliente() { return $this->belongsTo(User::class); }
     public function corretor() { return $this->belongsTo(User::class); }
     public function imovel() { return $this->belongsTo(Imovel::class); }
     public function historico() { return $this->hasMany(ProcessoHabitacionalHistory::class, 'processo_id'); }
 
+    public const STATUS_PENDENTE = 'PENDENTE';
+    public const STATUS_CONCLUIDA = 'CONCLUIDA';
+
     public static $etapas = [
         'CONTRATO_EMPREITADA'   => 'Contrato de Empreitada',
         'CONFECCAO_PROJETO'     => 'Confecção do Projeto',
-        'ENTREGA_PREFEITURA'    => 'Entrega na Prefeitura',
+        'APROVACAO_MUNICIPAL'    => 'Aprovação municipal',
         'ABERTURA_OS' => 'Abertura de Ordem de serviço',
         'AVALIACAO_CAIXA' => 'Avaliação da engenharia caixa',
         'CONFORMIDADE_PROCESSO' => 'Conformidade do processo',
@@ -60,9 +65,16 @@ class ProcessoHabitacional extends Model
     // 🔼 Avança o processo e salva no banco
     public function avancarEtapa(): void
     {
-        $novaEtapa = $this->getProximaEtapa();
-        if ($novaEtapa !== $this->etapa) {
-            $this->update(['etapa' => $novaEtapa]);
+        if ($this->status_etapa === self::STATUS_PENDENTE) {
+            $this->update(['status_etapa' => self::STATUS_CONCLUIDA]);
+        } else {
+            $novaEtapa = $this->getProximaEtapa();
+            if ($novaEtapa !== $this->etapa) {
+                $this->update([
+                    'etapa' => $novaEtapa,
+                    'status_etapa' => self::STATUS_PENDENTE
+                ]);
+            }
         }
     }
 
@@ -71,13 +83,21 @@ class ProcessoHabitacional extends Model
     {
         $novaEtapa = $this->getEtapaAnterior();
         if ($novaEtapa !== $this->etapa) {
-            $this->update(['etapa' => $novaEtapa]);
+            $this->update([
+                'etapa' => $novaEtapa,
+                'status_etapa' => self::STATUS_PENDENTE
+            ]);
         }
+    }
+
+    public function getDescricaoEtapaAttribute(): string
+    {
+        return self::$etapas[$this->etapa] . ' (' . $this->status_etapa . ')';
     }
 
     // 🧠 Retorna o nome descritivo da etapa atual
     public function getEtapaDescricao(): string
     {
-        return self::$etapas[$this->etapa] ?? 'Desconhecida';
+        return self::$etapas[$this->etapa] . ' (' . $this->status_etapa . ')';
     }
 }

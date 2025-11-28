@@ -39,16 +39,23 @@ class MetricaService
      * Retorna a quantidade de processos agrupados por etapa (equivalente a countProcessosByEtapa).
      * @return array
      */
-    public function getQuantidadeProcessoPorEtapa(): array
-    {
-        return ProcessoHabitacional::select('etapa', DB::raw('count(*) as quantidade'))
-            ->groupBy('etapa')
-            ->orderByDesc('quantidade')
-            ->get()
-            ->pluck('quantidade', 'etapa')
-            ->toArray();
-    }
-
+         public function getQuantidadeProcessoPorEtapa(): array
+        {
+            $etapasDoBanco = ProcessoHabitacional::select('etapa', DB::raw('count(*) as quantidade'))
+                ->groupBy('etapa')
+                ->orderByDesc('quantidade')
+                ->get()
+                ->pluck('quantidade', 'etapa')
+                ->toArray();
+    
+            $etapasComDescricao = [];
+            foreach ($etapasDoBanco as $etapaChave => $quantidade) {
+                $descricao = ProcessoHabitacional::$etapas[$etapaChave] ?? $etapaChave;
+                $etapasComDescricao[$descricao] = $quantidade;
+            }
+    
+            return $etapasComDescricao;
+        }
     /**
      * Calcula o Tempo Médio do Processo (em dias).
      * (Equivalente a findCreationAndCompletionDates e calcularTempoMedioPorProcessoEmDias)
@@ -175,7 +182,7 @@ public function getRankingCorretores(): array
                 return [
                     'id' => $processo->id,
                     'clienteNome' => $processo->cliente->name ?? 'Cliente Desconhecido',
-                    'etapaAtual' => $processo->etapa,
+                    'etapaAtual' => $processo->getEtapaDescricao(),
                 ];
             })->toArray(); // Converte a Collection de volta para array
 

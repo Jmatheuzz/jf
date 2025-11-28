@@ -59,7 +59,7 @@ class ProcessoHabitacionalController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $timeline = TimelineService::montarTimeline($processo->etapa);
+        $timeline = TimelineService::montarTimeline($processo->etapa, $processo->status_etapa);
 
         return response()->json([
             'processo' => $processo,
@@ -114,15 +114,10 @@ class ProcessoHabitacionalController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $etapaAnterior = $processo->etapa;
+        $processo->avancarEtapa();
+        $processo->save();
 
-        $novaEtapa = $processo->getProximaEtapa();
-
-        if ($novaEtapa === $etapaAnterior) {
-            return response()->json(['message' => 'O processo já está na última etapa.'], 400);
-        }
-
-        if ($novaEtapa === 'REGISTRO_CARTORIO') {
+        if ($processo->etapa === 'ASSINATURA_CONTRATO' && $processo->status_etapa === 'CONCLUIDA') {
             Comissao::create([
                 'processo_habitacional_id' => $processo->id,
                 'valor' => $processo->imovel->valor * 0.03,
@@ -130,18 +125,18 @@ class ProcessoHabitacionalController extends Controller
             ]);
         }
 
-        $processo->update(['etapa' => $novaEtapa]);
-
         ProcessoHabitacionalHistory::create([
             'processo_id' => $processo->id,
-            'etapa'       => $novaEtapa,
-            'observacao'  => "Avançou da etapa {$etapaAnterior} para {$novaEtapa} via API"
+            'etapa'       => $processo->etapa,
+            'observacao'  => "Avançou para {$processo->etapa} via API"
         ]);
+    
 
         return response()->json([
             'message' => 'Etapa avançada com sucesso!',
-            'etapa' => $novaEtapa,
-            'descricao' => ProcessoHabitacional::$etapas[$novaEtapa] ?? null,
+            'etapa' => $processo->etapa,
+            'status_etapa' => $processo->status_etapa,
+            'descricao' => $processo->getEtapaDescricao(),
         ]);
     }
 
@@ -160,7 +155,7 @@ class ProcessoHabitacionalController extends Controller
         if ($user->role === 'CLIENTE' && $processo->cliente_id !== $user->id) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
-
+        
         $etapaAnterior = $processo->etapa;
 
         $novaEtapa = $processo->getEtapaAnterior();
@@ -169,7 +164,7 @@ class ProcessoHabitacionalController extends Controller
             return response()->json(['message' => 'O processo já está na primeira etapa.'], 400);
         }
 
-        $processo->update(['etapa' => $novaEtapa]);
+        $processo->retrocederEtapa();
 
         ProcessoHabitacionalHistory::create([
             'processo_id' => $processo->id,
@@ -179,8 +174,9 @@ class ProcessoHabitacionalController extends Controller
 
         return response()->json([
             'message' => 'Etapa retornada com sucesso!',
-            'etapa' => $novaEtapa,
-            'descricao' => ProcessoHabitacional::$etapas[$novaEtapa] ?? null,
+            'etapa' => $processo->etapa,
+            'status_etapa' => $processo->status_etapa,
+            'descricao' => $processo->getEtapaDescricao(),
         ]);
     }
 

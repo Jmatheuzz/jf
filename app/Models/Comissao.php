@@ -19,6 +19,8 @@ class Comissao extends Model
         'pago',
     ];
 
+    protected $with = ['processoHabitacional'];
+
     public function processoHabitacional(): BelongsTo
     {
         return $this->belongsTo(ProcessoHabitacional::class);

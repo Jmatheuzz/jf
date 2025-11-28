@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->boolean('possui_filhos_menor')->default(false);
+            $table->dropColumn('possui_filhos_menor');
         });
     }
 };

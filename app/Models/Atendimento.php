@@ -9,6 +9,7 @@ class Atendimento extends Model
     use HasFactory, SoftDeletes;
     protected $table = 'atendimentos';
     protected $fillable = ['cliente_id','corretor_id','etapa','interesse', 'observacao', 'is_active'];
+    protected $appends = ['descricao_etapa'];
 
     public function cliente() { return $this->belongsTo(User::class); }
     public function corretor() { return $this->belongsTo(User::class); }
@@ -69,6 +70,11 @@ class Atendimento extends Model
 
     // 🧠 Retorna o nome descritivo da etapa atual
     public function getEtapaDescricao(): string
+    {
+        return self::$etapas[$this->etapa] ?? 'Desconhecida';
+    }
+
+    public function getDescricaoEtapaAttribute(): string
     {
         return self::$etapas[$this->etapa] ?? 'Desconhecida';
     }
