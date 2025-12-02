@@ -92,12 +92,12 @@ class ProcessoHabitacional extends Model
 
     public function getDescricaoEtapaAttribute(): string
     {
-        return self::$etapas[$this->etapa] . ' (' . $this->status_etapa . ')';
+        return self::$etapas[$this->etapa] ? self::$etapas[$this->etapa] . ' (' . $this->status_etapa . ')' : 'Desconhecida';
     }
 
     // 🧠 Retorna o nome descritivo da etapa atual
     public function getEtapaDescricao(): string
     {
-        return self::$etapas[$this->etapa] . ' (' . $this->status_etapa . ')';
+        return self::$etapas[$this->etapa] ? self::$etapas[$this->etapa] . ' (' . $this->status_etapa . ')' : 'Desconhecida';
     }
 }

@@ -41,7 +41,7 @@ class ProcessoHabitacionalController extends Controller
             'imovel_id' => 'nullable|integer',
             'observacao' => 'nullable|string',
         ]);
-
+        $data['etapa'] = array_key_first(ProcessoHabitacional::$etapas);
         $processo = ProcessoHabitacional::create($data);
         return response()->json($processo, 201);
     }

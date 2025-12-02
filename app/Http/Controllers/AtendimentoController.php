@@ -41,7 +41,7 @@ class AtendimentoController extends Controller
             'imovel_id' => 'nullable|integer',
             'observacao' => 'nullable|string',
         ]);
-
+        $data['etapa'] = array_key_first(Atendimento::$etapas);
         $processo = Atendimento::create($data);
         return response()->json($processo, 201);
     }
