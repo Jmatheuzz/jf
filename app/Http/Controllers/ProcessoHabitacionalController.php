@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreProcessoHabitacionalRequest;
 use App\Models\Comissao;
 use App\Models\Imovel;
 use App\Models\ProcessoHabitacional;
@@ -33,14 +34,9 @@ class ProcessoHabitacionalController extends Controller
         return response()->json($query->get());
     }
 
-    public function store(Request $request)
+    public function store(StoreProcessoHabitacionalRequest $request)
     {
-        $data = $request->validate([
-            'cliente_id' => 'required|integer',
-            'corretor_id' => 'nullable|integer',
-            'imovel_id' => 'nullable|integer',
-            'observacao' => 'nullable|string',
-        ]);
+        $data = $request->validated();
         $data['etapa'] = array_key_first(ProcessoHabitacional::$etapas);
         $processo = ProcessoHabitacional::create($data);
         return response()->json($processo, 201);
