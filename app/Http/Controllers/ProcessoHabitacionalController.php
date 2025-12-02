@@ -217,4 +217,43 @@ class ProcessoHabitacionalController extends Controller
         });
         return response()->json($grouped);
     }
+
+    public function avancarEtapaEsteira($id)
+    {
+        $user = auth()->user();
+        $processo = ProcessoHabitacional::findOrFail($id);
+
+        if ($user->role === 'CORRETOR' && $processo->corretor_id !== $user->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        if ($user->role === 'CLIENTE' && $processo->cliente_id !== $user->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $etapaAnterior = $processo->etapa;
+        $novaEtapa = $processo->getProximaEtapa();
+
+        if ($novaEtapa !== $etapaAnterior) {
+            $processo->update([
+                'etapa' => $novaEtapa,
+                'status_etapa' => ProcessoHabitacional::STATUS_PENDENTE
+            ]);
+        } else {
+            return response()->json(['message' => 'O processo já está na última etapa.'], 400);
+        }
+
+        ProcessoHabitacionalHistory::create([
+            'processo_id' => $processo->id,
+            'etapa'       => $processo->etapa,
+            'observacao'  => "Avançou da etapa {$etapaAnterior} para {$processo->etapa} (esteira) via API"
+        ]);
+
+        return response()->json([
+            'message' => 'Etapa avançada com sucesso!',
+            'etapa' => $processo->etapa,
+            'status_etapa' => $processo->status_etapa,
+            'descricao' => $processo->getEtapaDescricao(),
+        ]);
+    }
 }

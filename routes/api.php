@@ -66,6 +66,7 @@ Route::middleware(['jwt.verify'])->group(function () {
 
     // Processos habitacionais — avançar/voltar etapa e adicionar imóvel
     Route::post('processos/{id}/proxima-etapa', [ProcessoHabitacionalController::class, 'avancarEtapa']);
+    Route::post('processos/{id}/avancar-etapa-esteira', [ProcessoHabitacionalController::class, 'avancarEtapaEsteira']);
     Route::post('processos/{id}/etapa-anterior', [ProcessoHabitacionalController::class, 'voltarEtapa']);
     Route::post('processos/{id}/adicionar-imovel', [ProcessoHabitacionalController::class, 'adicionarImovel']);
     Route::post('processos/grouped-by-etapa', [ProcessoHabitacionalController::class, 'groupedByEtapa']);
