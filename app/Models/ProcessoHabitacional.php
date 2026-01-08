@@ -3,6 +3,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class ProcessoHabitacional extends Model
 {
@@ -16,6 +17,16 @@ class ProcessoHabitacional extends Model
     public function corretor() { return $this->belongsTo(User::class); }
     public function imovel() { return $this->belongsTo(Imovel::class); }
     public function historico() { return $this->hasMany(ProcessoHabitacionalHistory::class, 'processo_id'); }
+    public function documentos() { return $this->hasMany(DocumentoProcessoHabitacional::class); }
+
+    protected static function booted()
+    {
+        static::deleting(function ($processo) {
+            foreach ($processo->documentos as $documento) {
+                Storage::delete($documento->path);
+            }
+        });
+    }
 
     public const STATUS_PENDENTE = 'PENDENTE';
     public const STATUS_CONCLUIDA = 'CONCLUIDA';

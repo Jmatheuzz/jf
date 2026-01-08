@@ -8,6 +8,7 @@ use App\Models\ProcessoHabitacional;
 use App\Models\ProcessoHabitacionalHistory;
 use App\Services\TimelineService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProcessoHabitacionalController extends Controller
 {
@@ -48,7 +49,7 @@ class ProcessoHabitacionalController extends Controller
     public function show($id)
     {
         $user = auth()->user();
-        $processo = ProcessoHabitacional::with(['cliente', 'imovel', 'corretor'])->findOrFail($id);
+        $processo = ProcessoHabitacional::with(['cliente', 'imovel', 'corretor', 'documentos'])->findOrFail($id);
 
         if ($user->role === 'CORRETOR' && $processo->corretor_id !== $user->id) {
             return response()->json(['error' => 'Unauthorized'], 403);
@@ -58,10 +59,16 @@ class ProcessoHabitacionalController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
+        $documentos = $processo->documentos->map(function ($documento) {
+            $documento->url = Storage::url($documento->path);
+            return $documento;
+        });
+
         $timeline = TimelineService::montarTimeline($processo->etapa, $processo->status_etapa);
 
         return response()->json([
             'processo' => $processo,
+            'documentos' => $documentos,
             'timeline' => $timeline
         ]);
     }

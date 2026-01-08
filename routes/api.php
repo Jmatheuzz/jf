@@ -11,6 +11,7 @@ use App\Http\Controllers\ProcessoHabitacionalController;
 use App\Http\Controllers\ProcessoHabitacionalHistoryController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VisitaController;
+use App\Http\Controllers\DocumentoProcessoHabitacionalController;
 use App\Models\Atendimento;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -60,6 +61,11 @@ Route::middleware(['jwt.verify'])->group(function () {
     Route::apiResource('users', UserController::class);
     Route::apiResource('visitas', VisitaController::class);
     Route::apiResource('comissoes', ComissaoController::class);
+
+    // Documentos do processo habitacional
+    Route::post('processos/{processo_id}/documentos', [DocumentoProcessoHabitacionalController::class, 'store']);
+    Route::delete('documentos/{id}', [DocumentoProcessoHabitacionalController::class, 'destroy']);
+
 
     Route::get('corretores', [UserController::class, 'getCorretores']);
     Route::get('clientes', [UserController::class, 'getClientes']);
