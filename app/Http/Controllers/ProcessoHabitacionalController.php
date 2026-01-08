@@ -30,6 +30,9 @@ class ProcessoHabitacionalController extends Controller
             $query->where('id', $request->processo_id);
         }
 
+        if ($request->filled('etapa')) {
+            $query->where('etapa', array_search($request->etapa, ProcessoHabitacional::$etapas));
+        }
 
         return response()->json($query->get());
     }
