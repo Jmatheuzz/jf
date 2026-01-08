@@ -183,6 +183,7 @@ public function getRankingCorretores(): array
                     'id' => $processo->id,
                     'clienteNome' => $processo->cliente->name ?? 'Cliente Desconhecido',
                     'etapaAtual' => $processo->getEtapaDescricao(),
+                    'etapaEnum' => $processo->etapa,
                 ];
             })->toArray(); // Converte a Collection de volta para array
 
