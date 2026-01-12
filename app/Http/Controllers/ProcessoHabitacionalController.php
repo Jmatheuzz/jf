@@ -121,7 +121,7 @@ class ProcessoHabitacionalController extends Controller
         }
 
         $processo->avancarEtapa();
-        $processo->save();
+        
 
         if ($processo->etapa === 'ASSINATURA_CONTRATO' && $processo->status_etapa === 'CONCLUIDA') {
             Comissao::create([
@@ -129,8 +129,9 @@ class ProcessoHabitacionalController extends Controller
                 'valor' => ($processo->imovel->valor - 10000) * 0.03,
                 'pago' => false,
             ]);
+            $processo['data_assinatura'] = now();
         }
-
+        $processo->save();
         ProcessoHabitacionalHistory::create([
             'processo_id' => $processo->id,
             'etapa'       => $processo->etapa,

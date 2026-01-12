@@ -61,6 +61,7 @@ Route::middleware(['jwt.verify'])->group(function () {
     Route::apiResource('users', UserController::class);
     Route::get('users/{user}/processos', [UserController::class, 'getProcessosByCorretor']);
     Route::apiResource('visitas', VisitaController::class);
+    Route::get('comissoes/previsao', [ComissaoController::class, 'previsao']);
     Route::apiResource('comissoes', ComissaoController::class);
 
     // Documentos do processo habitacional
