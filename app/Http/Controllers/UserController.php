@@ -1,8 +1,10 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\ProcessoHabitacional;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -88,5 +90,34 @@ class UserController extends Controller
     {
         User::destroy($id);
         return response()->json(null, 204);
+    }
+
+    public function getProcessosByCorretor(User $user)
+    {
+        $authenticatedUser = Auth::user();
+
+        if ($authenticatedUser->role !== 'ADMIN' && ($authenticatedUser->role !== 'CORRETOR' || $authenticatedUser->id !== $user->id)) {
+            return response()->json(['error' => 'Acesso não autorizado.'], 403);
+        }
+        
+        if ($user->role !== 'CORRETOR') {
+            return response()->json(['error' => 'O usuário especificado não é um corretor.'], 400);
+        }
+
+        $processos = ProcessoHabitacional::where('corretor_id', $user->id)->get();
+
+        $formattedProcessos = $processos->map(function ($processo) {
+            return [
+                'corretor_nome' => $processo->corretor->name,
+                'cliente_nome' => $processo->cliente->name,
+                'etapa' => $processo->descricao_etapa,
+                'status_etapa' => $processo->status_etapa,
+                'imovel_nome' => $processo->imovel ? $processo->imovel->endereco . ' - ' . $processo->imovel->cidade : null,
+                'imovel_valor' => $processo->imovel ? $processo->imovel->valor : null,
+                'observacoes' => $processo->observacao,
+            ];
+        });
+
+        return response()->json($formattedProcessos);
     }
 }

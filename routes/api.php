@@ -59,6 +59,7 @@ Route::middleware(['jwt.verify'])->group(function () {
     Route::apiResource('processos-historico', ProcessoHabitacionalHistoryController::class);
     Route::apiResource('pos-vendas', PosVendaController::class);
     Route::apiResource('users', UserController::class);
+    Route::get('users/{user}/processos', [UserController::class, 'getProcessosByCorretor']);
     Route::apiResource('visitas', VisitaController::class);
     Route::apiResource('comissoes', ComissaoController::class);
 
