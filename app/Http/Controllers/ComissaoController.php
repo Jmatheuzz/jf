@@ -70,6 +70,7 @@ class ComissaoController extends Controller
             ->get();
     
         $previsoes = collect();
+        $tz = 'America/Sao_Paulo';
     
         foreach ($processos as $processo) {
             $valorComissao = 0;
@@ -77,7 +78,7 @@ class ComissaoController extends Controller
                 $valorComissao = ($processo->imovel->valor - 10000) * 0.03;
             }
 
-            $dataAssinatura = Carbon::parse($processo->data_assinatura_empreitada);
+            $dataAssinatura = Carbon::parse($processo->data_assinatura_empreitada, $tz);
             $dataPagamento = $dataAssinatura->addMonths(4);
     
             if ($dataPagamento->year >= 2026) {
