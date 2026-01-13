@@ -66,14 +66,14 @@ class ComissaoController extends Controller
     {
         $comissoes = Comissao::with('processoHabitacional')
             ->whereHas('processoHabitacional', function ($query) {
-                $query->whereNotNull('data_assinatura');
+                $query->whereNotNull('data_assinatura_empreitada');
             })
             ->get();
     
         $previsoes = collect();
     
         foreach ($comissoes as $comissao) {
-            $dataAssinatura = Carbon::parse($comissao->processoHabitacional->data_assinatura);
+            $dataAssinatura = Carbon::parse($comissao->processoHabitacional->data_assinatura_empreitada);
             $dataPagamento = $dataAssinatura->addMonths(4);
     
             if ($dataPagamento->year >= 2026) {
