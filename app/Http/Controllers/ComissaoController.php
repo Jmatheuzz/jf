@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Comissao;
+use App\Models\ProcessoHabitacional;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -64,21 +65,29 @@ class ComissaoController extends Controller
 
     public function previsao(Request $request)
     {
-        $comissoes = Comissao::with('processoHabitacional')
-            ->whereHas('processoHabitacional', function ($query) {
-                $query->whereNotNull('data_assinatura_empreitada');
-            })
+        $processos = ProcessoHabitacional::with('imovel')
+            ->whereNotNull('data_assinatura_empreitada')
             ->get();
     
         $previsoes = collect();
     
-        foreach ($comissoes as $comissao) {
-            $dataAssinatura = Carbon::parse($comissao->processoHabitacional->data_assinatura_empreitada);
+        foreach ($processos as $processo) {
+            $valorComissao = 0;
+            if ($processo->imovel && $processo->imovel->valor > 10000) {
+                $valorComissao = ($processo->imovel->valor - 10000) * 0.03;
+            }
+
+            $dataAssinatura = Carbon::parse($processo->data_assinatura_empreitada);
             $dataPagamento = $dataAssinatura->addMonths(4);
     
             if ($dataPagamento->year >= 2026) {
                 $previsoes->push([
-                    'comissao' => $comissao,
+                    'comissao_calculada' => [
+                        'processo_habitacional_id' => $processo->id,
+                        'valor' => $valorComissao,
+                        'pago' => false,
+                        'processo_habitacional' => $processo
+                    ],
                     'data_pagamento' => $dataPagamento,
                 ]);
             }
@@ -91,9 +100,9 @@ class ComissaoController extends Controller
         $resultado = $previsoesAgrupadas->map(function ($mesComissoes, $mes) {
             return [
                 'mes' => $mes,
-                'comissoes' => $mesComissoes->pluck('comissao'),
+                'comissoes' => $mesComissoes->pluck('comissao_calculada'),
                 'total_mes' => $mesComissoes->sum(function ($item) {
-                    return $item['comissao']['valor'];
+                    return $item['comissao_calculada']['valor'];
                 }),
             ];
         })->values();
