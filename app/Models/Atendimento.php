@@ -19,7 +19,10 @@ class Atendimento extends Model
         'COLHER_DOCUMENTACAO'       => 'Colher documentação',
         'ABERTURA_CONTA'              => 'Abertura de conta',
         'CONFORMIDADE_CONTA'  => 'Conformidade de conta',
-        'ANALISE_CREDITO'   => 'Análise de crédito'
+        'ANALISE_CREDITO'   => 'Análise de crédito',
+        'CLIENTE_APROVADO'   => 'Cliente aprovado',
+        'AGUARDANDO_ENTREVISTA'   => 'Aguardando entrevista',
+        'ENTREVISTA_APROVADA'   => 'Entrevista aprovada',
     ];
 
     // 🔙 Etapa anterior
