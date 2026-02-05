@@ -9,7 +9,7 @@ class ProcessoHabitacional extends Model
 {
     use HasFactory, SoftDeletes;
     protected $table = 'processos_habitacionais';
-    protected $fillable = ['cliente_id','corretor_id','imovel_id','etapa','interesse', 'observacao', 'status_etapa', 'correspondenteBancario', 'data_assinatura_empreitada'];
+    protected $fillable = ['cliente_id','corretor_id','imovel_id','etapa','interesse', 'observacao', 'status_etapa', 'correspondenteBancario', 'data_assinatura_empreitada', 'nomeConstrutora'];
     protected $with = ['cliente', 'corretor', 'imovel'];
     protected $appends = ['descricao_etapa'];
 

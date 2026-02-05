@@ -13,6 +13,7 @@ class StoreProcessoHabitacionalRequest extends FormRequest
             'corretor_id' => 'nullable|integer',
             'imovel_id' => 'nullable|integer',
             'correspondenteBancario' => 'nullable|string',
+            'nomeConstrutora' => 'nullable|string',
         ];
     }
 }
