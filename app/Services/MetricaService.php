@@ -17,13 +17,13 @@ class MetricaService
     public function getTaxaConversao(): float
     {
         $totalProcessos = ProcessoHabitacional::count();
-        $totalVisitas = Visita::count();
+        $totalProcessosComContrato = ProcessoHabitacional::where('etapa', 'ASSINATURA_CONTRATO')->where('status_etapa', 'CONCLUIDA')->count();
 
-        if ($totalVisitas == 0) {
+        if ($totalProcessos == 0) {
             return 0.0;
         }
 
-        return (float) $totalProcessos / $totalVisitas;
+        return (float) $totalProcessosComContrato / $totalProcessos;
     }
 
     /**
