@@ -40,6 +40,7 @@ class AtendimentoController extends Controller
             'corretor_id' => 'nullable|integer',
             'imovel_id' => 'nullable|integer',
             'observacao' => 'nullable|string',
+            'motivoCancelamento' => 'nullable|string',
         ]);
         $data['etapa'] = array_key_first(Atendimento::$etapas);
         $processo = Atendimento::create($data);
@@ -80,7 +81,12 @@ class AtendimentoController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $processo->update($request->all());
+        $data = $request->all();
+        if ($request->boolean('is_active')) {
+            $data['motivoCancelamento'] = null;
+        }
+
+        $processo->update($data);
         return response()->json($processo);
     }
 

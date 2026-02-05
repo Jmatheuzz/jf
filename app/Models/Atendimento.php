@@ -8,7 +8,7 @@ class Atendimento extends Model
 {
     use HasFactory, SoftDeletes;
     protected $table = 'atendimentos';
-    protected $fillable = ['cliente_id','corretor_id','etapa','interesse', 'observacao', 'is_active'];
+    protected $fillable = ['cliente_id','corretor_id','etapa','interesse', 'observacao', 'is_active', 'motivoCancelamento'];
     protected $appends = ['descricao_etapa'];
 
     public function cliente() { return $this->belongsTo(User::class); }
