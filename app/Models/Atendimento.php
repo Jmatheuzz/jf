@@ -8,8 +8,8 @@ class Atendimento extends Model
 {
     use HasFactory, SoftDeletes;
     protected $table = 'atendimentos';
-    protected $fillable = ['cliente_id','corretor_id','etapa','interesse', 'observacao', 'is_active', 'motivoCancelamento'];
-    protected $appends = ['descricao_etapa'];
+    protected $fillable = ['cliente_id','corretor_id','etapa','interesse', 'observacao', 'is_active', 'motivoCancelamento', 'valor_simulacao', 'data_simulacao'];
+    protected $appends = ['descricao_etapa', 'previsao_faturamento'];
 
     public function cliente() { return $this->belongsTo(User::class); }
     public function corretor() { return $this->belongsTo(User::class); }
@@ -80,5 +80,20 @@ class Atendimento extends Model
     public function getDescricaoEtapaAttribute(): string
     {
         return self::$etapas[$this->etapa] ?? 'Desconhecida';
+    }
+
+    public function getPrevisaoFaturamentoAttribute()
+    {
+        if (!$this->valor_simulacao || !$this->data_simulacao) {
+            return null;
+        }
+
+        $dataPrevisao = \Carbon\Carbon::parse($this->data_simulacao)->addMonths(5);
+        $valorPrevisto = $this->valor_simulacao - ($this->valor_simulacao * 0.03);
+
+        return [
+            'data' => $dataPrevisao->format('Y-m-d'),
+            'valor' => round($valorPrevisto, 2)
+        ];
     }
 }

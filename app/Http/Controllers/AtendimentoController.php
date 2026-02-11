@@ -41,6 +41,8 @@ class AtendimentoController extends Controller
             'imovel_id' => 'nullable|integer',
             'observacao' => 'nullable|string',
             'motivoCancelamento' => 'nullable|string',
+            'valor_simulacao' => 'nullable|numeric',
+            'data_simulacao' => 'nullable|date',
         ]);
         $data['etapa'] = array_key_first(Atendimento::$etapas);
         $processo = Atendimento::create($data);
@@ -107,7 +109,7 @@ class AtendimentoController extends Controller
         return response()->json(null, 204);
     }
 
-    public function avancarEtapa($id)
+    public function avancarEtapa(Request $request, $id)
     {
         $user = auth()->user();
         $processo = Atendimento::findOrFail($id);
@@ -128,7 +130,13 @@ class AtendimentoController extends Controller
             return response()->json(['message' => 'O processo já está na última etapa.'], 400);
         }
 
-        $processo->update(['etapa' => $novaEtapa]);
+        $updateData = ['etapa' => $novaEtapa];
+        if ($etapaAnterior === 'SIMULACAO') {
+            $updateData['data_simulacao'] = now();
+            $updateData['valor_simulacao'] = $request->validate(['valor_simulacao' => 'required|numeric'])['valor_simulacao'];
+        }
+
+        $processo->update($updateData);
 
         return response()->json([
             'message' => 'Etapa avançada com sucesso!',

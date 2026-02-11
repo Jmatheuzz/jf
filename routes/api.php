@@ -95,5 +95,6 @@ Route::middleware(['jwt.verify'])->group(function () {
     Route::get('processos-risco', [MetricaController::class, 'processosRisco']);
     Route::get('ranking-corretores', [MetricaController::class, 'rankingCorretores']);
     Route::get('pipeline-corretores', [MetricaController::class, 'pipelineCorretores']);
+    Route::get('previsao-faturamento', [MetricaController::class, 'previsaoFaturamento']);
 
 });

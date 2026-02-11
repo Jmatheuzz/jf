@@ -197,4 +197,57 @@ public function getRankingCorretores(): array
 
         return $pipeline;
     }
+
+    /**
+     * Calcula a Previsão de Faturamento Geral baseada nos Atendimentos.
+     * Considera atendimentos ativos com simulação realizada.
+     * Data de Faturamento = Data Simulação + 5 meses.
+     * Valor = Valor Simulação - 3%.
+     */
+    public function getPrevisaoFaturamentoGeral(): array
+    {
+        // Busca atendimentos elegíveis
+        $atendimentos = \App\Models\Atendimento::with('cliente')
+            ->where('is_active', true)
+            ->whereNotNull('data_simulacao')
+            ->whereNotNull('valor_simulacao')
+            ->get();
+
+        $faturamentoPorMes = [];
+
+        foreach ($atendimentos as $atendimento) {
+            $dataSimulacao = Carbon::parse($atendimento->data_simulacao);
+            $dataPrevisao = $dataSimulacao->addMonths(5);
+            
+            $mesAno = $dataPrevisao->format('Y-m'); // Chave de agrupamento: Ano-Mês
+            
+            // Valor Simulação - 3%
+            $valorLiquido = $atendimento->valor_simulacao * 0.97;
+
+            if (!isset($faturamentoPorMes[$mesAno])) {
+                $faturamentoPorMes[$mesAno] = [
+                    'mes' => $dataPrevisao->format('m'),
+                    'ano' => $dataPrevisao->format('Y'),
+                    'mes_ano_label' => $dataPrevisao->format('m/Y'),
+                    'total_previsto' => 0.0,
+                    'atendimentos' => []
+                ];
+            }
+
+            $faturamentoPorMes[$mesAno]['total_previsto'] += $valorLiquido;
+            $faturamentoPorMes[$mesAno]['atendimentos'][] = [
+                'id' => $atendimento->id,
+                'cliente_nome' => $atendimento->cliente->name ?? 'Cliente Desconhecido',
+                'corretor_nome' => $atendimento->corretor->name ?? 'Corretor Desconhecido',
+                'valor_previsto' => round($valorLiquido, 2),
+                'data_previsao' => $dataPrevisao->format('Y-m-d')
+            ];
+        }
+
+        // Ordena por data (chave do array)
+        ksort($faturamentoPorMes);
+
+        // Retorna apenas os valores (array indexado)
+        return array_values($faturamentoPorMes);
+    }
 }

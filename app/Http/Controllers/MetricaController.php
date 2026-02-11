@@ -77,4 +77,13 @@ class MetricaController extends Controller
         $pipeline = $this->metricaService->getPipelineProcessosPorCorretor();
         return response()->json($pipeline, Response::HTTP_OK);
     }
+
+    public function previsaoFaturamento(): JsonResponse
+    {
+        $previsao = $this->metricaService->getPrevisaoFaturamentoGeral();
+        return response()->json([
+            'status' => 'Ok',
+            'data' => $previsao
+        ], Response::HTTP_OK);
+    }
 }
