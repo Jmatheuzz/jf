@@ -86,4 +86,13 @@ class MetricaController extends Controller
             'data' => $previsao
         ], Response::HTTP_OK);
     }
+
+    public function faturamentoPrevistoMesAtual(): JsonResponse
+    {
+        $valor = $this->metricaService->getFaturamentoPrevistoMesAtual();
+        return response()->json([
+            'status' => 'Ok',
+            'valor' => $valor
+        ], Response::HTTP_OK);
+    }
 }

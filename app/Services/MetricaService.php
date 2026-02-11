@@ -250,4 +250,25 @@ public function getRankingCorretores(): array
         // Retorna apenas os valores (array indexado)
         return array_values($faturamentoPorMes);
     }
+
+    /**
+     * Calcula o valor total de faturamento previsto para o mês atual.
+     */
+    public function getFaturamentoPrevistoMesAtual(): float
+    {
+        $mesAtual = Carbon::now()->format('m');
+        $anoAtual = Carbon::now()->format('Y');
+
+        // Atendimentos que faturarão este mês foram simulados há 5 meses
+        $dataSimulacaoAlvo = Carbon::now()->subMonths(5);
+        $mesSimulacao = $dataSimulacaoAlvo->format('m');
+        $anoSimulacao = $dataSimulacaoAlvo->format('Y');
+
+        return (float) \App\Models\Atendimento::where('is_active', true)
+            ->whereMonth('data_simulacao', $mesSimulacao)
+            ->whereYear('data_simulacao', $anoSimulacao)
+            ->whereNotNull('valor_simulacao')
+            ->get()
+            ->sum(fn($atendimento) => $atendimento->valor_simulacao * 0.97);
+    }
 }

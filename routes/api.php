@@ -96,5 +96,6 @@ Route::middleware(['jwt.verify'])->group(function () {
     Route::get('ranking-corretores', [MetricaController::class, 'rankingCorretores']);
     Route::get('pipeline-corretores', [MetricaController::class, 'pipelineCorretores']);
     Route::get('previsao-faturamento', [MetricaController::class, 'previsaoFaturamento']);
+    Route::get('faturamento-previsto-mes-atual', [MetricaController::class, 'faturamentoPrevistoMesAtual']);
 
 });
