@@ -42,7 +42,7 @@ class TimelineService
         $timeline = [];
         $todasEtapas = Atendimento::$etapas;
 
-        if ($etapaAtual === 'FINALIZADO') {
+        if ($etapaAtual === 'ENTREVISTA_APROVADA') {
             foreach ($todasEtapas as $chave => $descricao) {
                 $timeline[] = [
                     'chave' => $chave,

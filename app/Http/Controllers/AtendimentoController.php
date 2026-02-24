@@ -127,7 +127,7 @@ class AtendimentoController extends Controller
         $novaEtapa = $processo->getProximaEtapa();
 
         if ($novaEtapa === $etapaAnterior) {
-            return response()->json(['message' => 'O processo já está na última etapa.'], 400);
+            return response()->json(['message' => 'O processo já está na última etapa.']);
         }
 
         $updateData = ['etapa' => $novaEtapa];
@@ -166,7 +166,7 @@ class AtendimentoController extends Controller
         $novaEtapa = $processo->getEtapaAnterior();
 
         if ($novaEtapa === $etapaAnterior) {
-            return response()->json(['message' => 'O processo já está na primeira etapa.'], 400);
+            return response()->json(['message' => 'O processo já está na primeira etapa.']);
         }
 
         $processo->update(['etapa' => $novaEtapa]);
