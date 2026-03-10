@@ -15,14 +15,14 @@ class Atendimento extends Model
     public function corretor() { return $this->belongsTo(User::class); }
 
     public static $etapas = [
-        'SIMULACAO'   => 'Simulação',
-        'COLHER_DOCUMENTACAO'       => 'Colher documentação',
-        'ABERTURA_CONTA'              => 'Abertura de conta',
-        'CONFORMIDADE_CONTA'  => 'Conformidade de conta',
-        'ANALISE_CREDITO'   => 'Análise de crédito',
-        'CLIENTE_APROVADO'   => 'Cliente aprovado',
-        'AGUARDANDO_ENTREVISTA'   => 'Aguardando entrevista',
-        'ENTREVISTA_APROVADA'   => 'Entrevista aprovada',
+        'SIMULACAO' => 'Simulação em negociação',
+        'COLHER_DOCUMENTACAO'     => 'Aguardando documentação',
+        'ABERTURA_CONTA'            => 'Aguardando abertura de conta',
+        'CONFORMIDADE_CONTA'=> 'Aguardando conformidade de conta',
+        'ANALISE_CREDITO' => 'Aguardando análise crédito',
+        'CLIENTE_APROVADO' => 'Cliente aprovado',
+        'AGUARDANDO_ENTREVISTA' => 'Aguardando entrevista',
+        'ENTREVISTA_APROVADA' => 'Entrevista aprovada',
     ];
 
     // 🔙 Etapa anterior
